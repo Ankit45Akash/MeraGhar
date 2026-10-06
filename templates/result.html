@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MeraGhar | Property Estimate</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        /* =====================================
+           RESULT PAGE
+        ===================================== */
+
+        .result-page {
+            min-height: calc(100vh - 76px);
+
+            padding: 70px 20px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        .result-card {
+
+            width: min(850px, 95%);
+
+            background: white;
+
+            border-radius: 25px;
+
+            padding: 50px;
+
+            box-shadow: 0 20px 60px rgba(23, 37, 31, 0.12);
+
+            text-align: center;
+        }
+
+
+        .result-label {
+
+            color: var(--orange);
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            letter-spacing: 2px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .result-card h1 {
+
+            color: var(--dark);
+
+            font-size: 20px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .price {
+
+            color: var(--dark);
+
+            font-size: clamp(45px, 8vw, 72px);
+
+            font-weight: 900;
+
+            letter-spacing: -2px;
+
+            margin: 15px 0 35px;
+        }
+
+
+        .price-line {
+
+            width: 70px;
+
+            height: 4px;
+
+            background: var(--orange);
+
+            margin: 0 auto 35px;
+
+            border-radius: 10px;
+        }
+
+
+        /* PROPERTY SUMMARY */
+
+        .property-summary {
+
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 30px;
+        }
+
+
+        .summary-item {
+
+            padding: 20px 10px;
+
+            background: #fbfaf7;
+
+            border: 1px solid var(--border);
+
+            border-radius: 15px;
+        }
+
+
+        .summary-icon {
+
+            font-size: 23px;
+
+            margin-bottom: 7px;
+        }
+
+
+        .summary-title {
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+            margin-bottom: 3px;
+        }
+
+
+        .summary-value {
+
+            color: var(--dark);
+
+            font-size: 16px;
+
+            font-weight: 800;
+        }
+
+
+        /* PROPERTY DETAILS */
+
+        .details-box {
+
+            text-align: left;
+
+            border-top: 1px solid var(--border);
+
+            padding-top: 25px;
+
+            margin-top: 10px;
+        }
+
+
+        .details-box h2 {
+
+            color: var(--dark);
+
+            font-size: 18px;
+
+            margin-bottom: 18px;
+        }
+
+
+        .details-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 12px;
+        }
+
+
+        .detail {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            padding: 13px 15px;
+
+            background: #fbfaf7;
+
+            border-radius: 10px;
+
+            font-size: 14px;
+        }
+
+
+        .detail span:first-child {
+
+            color: var(--muted);
+        }
+
+
+        .detail span:last-child {
+
+            color: var(--dark);
+
+            font-weight: 700;
+        }
+
+
+        /* SCORE */
+
+        .score-box {
+
+            margin-top: 30px;
+
+            padding: 25px;
+
+            background: var(--dark);
+
+            border-radius: 16px;
+
+            color: white;
+        }
+
+
+        .score-number {
+
+            font-size: 35px;
+
+            font-weight: 900;
+
+            color: var(--orange);
+
+        }
+
+
+        .score-text {
+
+            color: #bdc7c1;
+
+            font-size: 13px;
+
+            margin-top: 3px;
+
+        }
+
+
+        /* BUTTON */
+
+        .back-button {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            margin-top: 30px;
+
+            padding: 15px 28px;
+
+            background: var(--orange);
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 12px;
+
+            font-weight: 800;
+
+            font-size: 14px;
+
+            transition: 0.25s;
+
+        }
+
+
+        .back-button:hover {
+
+            background: var(--orange-light);
+
+            transform: translateY(-2px);
+
+        }
+
+
+        /* ERROR */
+
+        .error-box {
+
+            padding: 25px;
+
+            background: #fff1ed;
+
+            border: 1px solid #f0b6a5;
+
+            border-radius: 12px;
+
+            color: #a33d24;
+
+        }
+
+
+        /* MOBILE */
+
+        @media (max-width: 650px) {
+
+            .result-card {
+
+                padding: 35px 20px;
+
+            }
+
+
+            .property-summary {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .details-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+
+            <span class="logo-icon">⌂</span>
+
+            <span>
+                Mera<span class="logo-highlight">Ghar</span>
+            </span>
+
+        </div>
+
+
+        <div class="nav-text">
+
+            Smart Indian Property Estimator
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- RESULT -->
+
+    <main class="result-page">
+
+
+        {% if error %}
+
+        <!-- ERROR -->
+
+        <div class="result-card">
+
+            <div class="result-label">
+                SOMETHING WENT WRONG
+            </div>
+
+            <h1>We couldn't calculate the estimate.</h1>
+
+            <div class="error-box">
+
+                {{ error }}
+
+            </div>
+
+            <a href="/" class="back-button">
+                ← Try Again
+            </a>
+
+        </div>
+
+
+        {% else %}
+
+        <!-- SUCCESS -->
+
+        <div class="result-card">
+
+
+            <div class="result-label">
+                YOUR ESTIMATED PROPERTY VALUE
+            </div>
+
+
+            <h1>
+                MeraGhar estimates your property at
+            </h1>
+
+
+            <div class="price">
+
+                {{ price }}
+
+            </div>
+
+
+            <div class="price-line"></div>
+
+
+
+            <!-- QUICK SUMMARY -->
+
+            <div class="property-summary">
+
+
+                <div class="summary-item">
+
+                    <div class="summary-icon">
+                        🏙️
+                    </div>
+
+                    <div class="summary-title">
+                        City
+                    </div>
+
+                    <div class="summary-value">
+                        {{ city }}
+                    </div>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <div class="summary-icon">
+                        🛏️
+                    </div>
+
+                    <div class="summary-title">
+                        Bedrooms
+                    </div>
+
+                    <div class="summary-value">
+                        {{ bedrooms }}
+                    </div>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <div class="summary-icon">
+                        📐
+                    </div>
+
+                    <div class="summary-title">
+                        Area
+                    </div>
+
+                    <div class="summary-value">
+                        {{ area }} sq.ft.
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- DETAILS -->
+
+            <div class="details-box">
+
+                <h2>
+                    Property Details
+                </h2>
+
+
+                <div class="details-grid">
+
+
+                    <div class="detail">
+
+                        <span>City</span>
+
+                        <span>{{ city }}</span>
+
+                    </div>
+
+
+                    <div class="detail">
+
+                        <span>Area</span>
+
+                        <span>{{ area }} sq.ft.</span>
+
+                    </div>
+
+
+                    <div class="detail">
+
+                        <span>Bedrooms</span>
+
+                        <span>{{ bedrooms }}</span>
+
+                    </div>
+
+
+                    <div class="detail">
+
+                        <span>Car Parking</span>
+
+                        <span>
+                            {% if parking == 1 %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif %}
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail">
+
+                        <span>Swimming Pool</span>
+
+                        <span>
+                            {% if pool == 1 %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif %}
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail">
+
+                        <span>Resale Property</span>
+
+                        <span>
+                            {% if resale == 1 %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif %}
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PROPERTY SCORE -->
+
+            <div class="score-box">
+
+                <div class="score-number">
+                    {{ score }}/100
+                </div>
+
+                <div class="score-text">
+
+                    {{ insight }}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- BACK -->
+
+            <a href="/" class="back-button">
+
+                ← Estimate Another Property
+
+            </a>
+
+
+        </div>
+
+        {% endif %}
+
+
+    </main>
+
+
+</body>
+
+</html>

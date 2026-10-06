@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MeraGhar | Smart Property Price Predictor</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            <span class="logo-icon">⌂</span>
+            <span>Mera<span class="logo-highlight">Ghar</span></span>
+        </div>
+
+        <div class="nav-text">
+            Smart Indian Property Estimator
+        </div>
+
+    </nav>
+
+
+    <!-- HERO SECTION -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <div class="badge">
+                🇮🇳 Made for Indian Properties
+            </div>
+
+            <h1>
+                Know the value of<br>
+                <span>your dream home.</span>
+            </h1>
+
+            <p>
+                Get an estimated property price using area,
+                bedrooms, city and property features.
+            </p>
+
+        </div>
+
+        <div class="hero-house">
+            <div class="house-symbol">⌂</div>
+        </div>
+
+    </section>
+
+
+    <!-- PREDICTOR -->
+
+    <section class="predictor-section">
+
+        <div class="section-heading">
+
+            <p class="small-heading">PROPERTY DETAILS</p>
+
+            <h2>
+                Tell us about your property
+            </h2>
+
+            <p>
+                Enter a few details and MeraGhar will estimate its value.
+            </p>
+
+        </div>
+
+
+        <form action="/predict" method="POST" class="property-form">
+
+
+            <!-- CITY -->
+
+            <div class="form-group">
+
+                <label for="city">
+                    <span>🏙️</span>
+                    City
+                </label>
+
+                <select name="city" id="city" required>
+
+                    <option value="">Select your city</option>
+
+                    <option value="Pune">Pune</option>
+
+                    <option value="Mumbai">Mumbai</option>
+
+                    <option value="Bangalore">Bangalore</option>
+
+                    <option value="Hyderabad">Hyderabad</option>
+
+                    <option value="Noida">Noida</option>
+
+                    <option value="Ghaziabad">Ghaziabad</option>
+
+                </select>
+
+            </div>
+
+
+            <!-- AREA -->
+
+            <div class="form-group">
+
+                <label for="area">
+                    <span>📐</span>
+                    Area
+                </label>
+
+                <div class="input-with-unit">
+
+                    <input
+                        type="number"
+                        name="area"
+                        id="area"
+                        placeholder="e.g. 1200"
+                        min="300"
+                        required
+                    >
+
+                    <span>sq.ft.</span>
+
+                </div>
+
+            </div>
+
+
+            <!-- BEDROOMS -->
+
+            <div class="form-group">
+
+                <label for="bedrooms">
+                    <span>🛏️</span>
+                    Bedrooms
+                </label>
+
+                <select name="bedrooms" id="bedrooms" required>
+
+                    <option value="">Select bedrooms</option>
+
+                    <option value="1">1 Bedroom</option>
+
+                    <option value="2">2 Bedrooms</option>
+
+                    <option value="3">3 Bedrooms</option>
+
+                    <option value="4">4 Bedrooms</option>
+
+                </select>
+
+            </div>
+
+
+            <!-- PARKING -->
+
+            <div class="form-group">
+
+                <label for="parking">
+                    <span>🚗</span>
+                    Car Parking
+                </label>
+
+                <select name="parking" id="parking" required>
+
+                    <option value="">Select option</option>
+
+                    <option value="1">Yes</option>
+
+                    <option value="0">No</option>
+
+                </select>
+
+            </div>
+
+
+            <!-- POOL -->
+
+            <div class="form-group">
+
+                <label for="pool">
+                    <span>🏊</span>
+                    Swimming Pool
+                </label>
+
+                <select name="pool" id="pool" required>
+
+                    <option value="">Select option</option>
+
+                    <option value="1">Yes</option>
+
+                    <option value="0">No</option>
+
+                </select>
+
+            </div>
+
+
+            <!-- RESALE -->
+
+            <div class="form-group">
+
+                <label for="resale">
+                    <span>🔄</span>
+                    Resale Property
+                </label>
+
+                <select name="resale" id="resale" required>
+
+                    <option value="">Select option</option>
+
+                    <option value="0">No — New Property</option>
+
+                    <option value="1">Yes — Resale</option>
+
+                </select>
+
+            </div>
+
+
+            <!-- BUTTON -->
+
+            <button type="submit" class="predict-button">
+
+                <span>Estimate Property Value</span>
+
+                <span class="arrow">→</span>
+
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- HOW IT WORKS -->
+
+    <section class="how-section">
+
+        <div class="section-heading">
+
+            <p class="small-heading">HOW IT WORKS</p>
+
+            <h2>Simple. Quick. MeraGhar.</h2>
+
+        </div>
+
+
+        <div class="steps">
+
+            <div class="step">
+
+                <div class="step-number">01</div>
+
+                <h3>Enter Details</h3>
+
+                <p>
+                    Tell us about the area, bedrooms,
+                    city and property features.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">02</div>
+
+                <h3>Our Model Calculates</h3>
+
+                <p>
+                    Our machine learning model analyzes
+                    your property details.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">03</div>
+
+                <h3>Get Your Estimate</h3>
+
+                <p>
+                    Receive an estimated property value
+                    instantly.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="footer-logo">
+            Mera<span>Ghar</span>
+        </div>
+
+        <p>
+            Smart Indian Property Price Predictor
+        </p>
+
+        <p class="copyright">
+            © 2026 MeraGhar. Built for educational purposes.
+        </p>
+
+    </footer>
+
+
+</body>
+
+</html>
