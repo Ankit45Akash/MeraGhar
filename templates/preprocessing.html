@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Preprocessing | MeraGhar</title>
+    <style>
+        * { box-sizing:border-box; }
+        body { margin:0; background:#f5f6f2; color:#29372e; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+        .layout { display:grid; grid-template-columns:225px minmax(0,1fr); min-height:100vh; }
+        aside { background:#203d31; padding:25px 17px; color:white; }
+        .brand { display:flex; align-items:center; gap:10px; margin:0 8px 34px; color:white; text-decoration:none; font-size:23px; font-weight:750; letter-spacing:-.7px; }
+        .house { width:36px; height:36px; display:grid; place-items:center; background:#e8eee5; color:#245b43; border-radius:7px; font-size:23px; }
+        .nav-label { margin:23px 10px 10px; color:#b7c8bc; font-size:10px; letter-spacing:1.4px; text-transform:uppercase; }
+        .nav-link { display:block; padding:11px 12px; margin:4px 0; border-radius:6px; color:#e0e9e2; font-size:13px; text-decoration:none; }
+        .nav-link:hover,.active { background:#365b48; }
+        main { min-width:0; padding:30px clamp(16px,3vw,38px); }
+        h1 { margin:0; font-size:30px; letter-spacing:-.8px; }
+        h2 { margin:0 0 14px; font-size:17px; }
+        h3 { margin:0 0 8px; font-size:14px; }
+        .muted { color:#788078; font-size:13px; line-height:1.7; }
+        .header { padding-bottom:20px; border-bottom:1px solid #e1e5de; }
+        .intro { margin:18px 0 24px; }
+        .cards { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:13px; margin-bottom:22px; }
+        .card,.panel { min-width:0; background:white; border:1px solid #e2e6df; border-radius:9px; padding:19px; }
+        .card span { color:#788078; font-size:12px; }
+        .card strong { display:block; margin-top:9px; color:#245b43; font-size:26px; }
+        .section { margin-top:20px; }
+        .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; }
+        .status { display:inline-block; padding:5px 8px; border-radius:4px; background:#e8f3e9; color:#276341; font-size:11px; }
+        .table-wrap { overflow-x:auto; }
+        table { width:100%; border-collapse:collapse; font-size:12px; }
+        th,td { padding:12px 10px; border-bottom:1px solid #edf0eb; text-align:left; }
+        th { background:#f2f5f0; color:#526054; }
+        .step { display:flex; gap:13px; margin:15px 0; }
+        .step-number { flex:0 0 29px; width:29px; height:29px; display:grid; place-items:center; border-radius:50%; background:#e5eee4; color:#245b43; font-weight:700; }
+        .step p { margin:5px 0 0; }
+        .note { margin-top:20px; padding:15px 17px; border-left:3px solid #ba8b50; background:#fbf5e9; color:#736044; font-size:12px; line-height:1.8; }
+        footer { margin-top:25px; padding-top:17px; border-top:1px solid #e1e5de; color:#858d84; font-size:11px; }
+        @media(max-width:900px) { .cards { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media(max-width:700px) { .layout { grid-template-columns:1fr; } aside { padding:15px; } .brand { margin:0 8px 15px; } .nav-link { display:inline-block; margin:3px; } main { padding:22px 13px; } .grid { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside>
+        <a class="brand" href="/">
+            <span class="house">⌂</span>
+            <span>MeraGhar<span style="color:#d5a66d">.</span></span>
+        </a>
+        <div class="nav-label">Workspace</div>
+        <a class="nav-link" href="/dashboard">▦ &nbsp; Dashboard</a>
+        <a class="nav-link" href="/dataset">▤ &nbsp; Dataset Explorer</a>
+        <a class="nav-link active" href="/preprocessing">⚒ &nbsp; Data Preprocessing</a>
+        <a class="nav-link" href="/visualization">▥ &nbsp; Data Visualization</a>
+        <a class="nav-link" href="/algorithms">◫ &nbsp; Model Comparison</a>
+        <div class="nav-label">Property tools</div>
+        <a class="nav-link" href="/">⌂ &nbsp; Price Estimator</a>
+        <a class="nav-link" href="/about">ⓘ &nbsp; About Project</a>
+    </aside>
+
+    <main>
+        <header class="header">
+            <h1>Data Preprocessing</h1>
+            <p class="muted">
+                Review the dataset's structure and the steps used to prepare
+                property features for machine learning.
+            </p>
+        </header>
+
+        <p class="muted intro">
+            This page reports the current CSV's data quality. The training
+            pipeline handles missing feature values and converts categorical
+            values into numerical model inputs when training.
+        </p>
+
+        <section class="cards">
+            <div class="card">
+                <span>Dataset records</span>
+                <strong>{{ "{:,}".format(total_rows) }}</strong>
+            </div>
+            <div class="card">
+                <span>Columns</span>
+                <strong>{{ total_columns }}</strong>
+            </div>
+            <div class="card">
+                <span>Missing cells</span>
+                <strong>{{ missing_total }}</strong>
+            </div>
+            <div class="card">
+                <span>Duplicate rows</span>
+                <strong>{{ duplicate_count }}</strong>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="panel">
+                <h2>Dataset quality check</h2>
+                <p class="muted">
+                    These checks inspect the CSV as it currently exists.
+                    They do not modify or clean the original file.
+                </p>
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <div>
+                        <h3>Missing values</h3>
+                        <p class="muted">
+                            Total missing cells: <strong>{{ missing_total }}</strong>.
+                            Missing feature values are handled by the model pipeline.
+                        </p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <div>
+                        <h3>Duplicate records</h3>
+                        <p class="muted">
+                            <strong>{{ duplicate_count }}</strong> fully duplicated rows
+                            detected. The current training script does not automatically
+                            remove duplicate rows.
+                        </p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <div>
+                        <h3>Target validation</h3>
+                        <p class="muted">
+                            Rows without a usable target price are excluded by the
+                            training script, and prices must be positive.
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="panel">
+                <h2>Model preprocessing pipeline</h2>
+                <p class="muted">Steps applied when the training script fits each model.</p>
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <div>
+                        <h3>Train/test split</h3>
+                        <p class="muted">80% for training and 20% for testing, with a fixed random seed.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <div>
+                        <h3>Numeric features</h3>
+                        <p class="muted">Missing numeric values are filled with the training median; values are standardized.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <div>
+                        <h3>Categorical features</h3>
+                        <p class="muted">Missing categories use the most frequent value; one-hot encoding converts categories into model-ready inputs.</p>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="panel section">
+            <h2>Missing values by column</h2>
+            <p class="muted">A count of missing cells in each column of the current CSV.</p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Column</th><th>Missing cells</th><th>Status</th></tr></thead>
+                    <tbody>
+                    {% for item in missing_rows %}
+                        <tr>
+                            <td>{{ item.column }}</td>
+                            <td>{{ item.missing }}</td>
+                            <td>
+                                {% if item.missing == 0 %}
+                                    <span class="status">Complete</span>
+                                {% else %}
+                                    <span style="color:#98682c">Needs review</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel section">
+            <h2>Column data types</h2>
+            <p class="muted">Types detected by pandas when the CSV is loaded.</p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Column</th><th>Detected type</th></tr></thead>
+                    <tbody>
+                    {% for item in type_rows %}
+                        <tr><td>{{ item.column }}</td><td>{{ item.dtype }}</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="grid section">
+            <article class="panel">
+                <h2>Numeric columns</h2>
+                <p class="muted">Detected numeric data fields.</p>
+                {% for column in numeric_columns %}
+                    <span class="status" style="margin:3px">{{ column }}</span>
+                {% endfor %}
+            </article>
+            <article class="panel">
+                <h2>Categorical columns</h2>
+                <p class="muted">Text or category fields that need encoding before regression.</p>
+                {% for column in categorical_columns %}
+                    <span class="status" style="margin:3px">{{ column }}</span>
+                {% endfor %}
+            </article>
+        </section>
+
+        <div class="note">
+            <strong>Important:</strong> This page is a report, not a cleaning operation.
+            The CSV is left unchanged. The training pipeline performs its
+            imputing, scaling and encoding inside each fitted model. Duplicate
+            rows are reported but are not removed by the current training script.
+        </div>
+
+        <footer>MeraGhar · Data Preprocessing · Academic machine-learning project</footer>
+    </main>
+</div>
+</body>
+</html>

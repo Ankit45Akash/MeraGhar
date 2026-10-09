@@ -1,328 +1,1071 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeraGhar | House Price Predictor</title>
 
-    <title>MeraGhar | Smart Property Price Predictor</title>
+    <style>
+        :root {
+            --green: #244b3a;
+            --dark-green: #183629;
+            --sage: #e9efe6;
+            --cream: #f8f7f2;
+            --white: #ffffff;
+            --text: #29372f;
+            --muted: #6e7b72;
+            --border: #e2e7df;
+            --gold: #b99050;
+        }
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .container {
+            width: min(1160px, 92%);
+            margin: auto;
+        }
+
+        /* NAVIGATION */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.97);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-inner {
+            min-height: 78px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            background: var(--sage);
+            border: 1px solid #d9e3d5;
+            border-radius: 11px;
+            color: var(--green);
+            font-size: 29px;
+        }
+
+        .brand-name {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 25px;
+            line-height: 1.15;
+            font-weight: bold;
+            letter-spacing: -0.8px;
+            color: var(--dark-green);
+        }
+
+        .brand-name span {
+            color: var(--gold);
+        }
+
+        .brand-tagline {
+            color: var(--muted);
+            font-size: 9px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .nav-links a {
+            color: #526157;
+            padding: 9px 10px;
+            border-radius: 7px;
+            white-space: nowrap;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: var(--sage);
+            color: var(--green);
+        }
+
+        .nav-links .nav-cta {
+            color: white;
+            background: var(--green);
+            padding: 10px 14px;
+            margin-left: 4px;
+        }
+
+        .nav-links .nav-cta:hover {
+            background: var(--dark-green);
+        }
+
+        /* HERO */
+        .hero {
+            padding: 66px 0 58px;
+            background: var(--cream);
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.02fr 0.98fr;
+            align-items: center;
+            gap: 48px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--sage);
+            color: var(--green);
+            padding: 7px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 0.8px;
+            margin-bottom: 21px;
+        }
+
+        .eyebrow-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #6d956e;
+        }
+
+        .hero h1 {
+            color: var(--dark-green);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(38px, 4.2vw, 56px);
+            line-height: 1.12;
+            letter-spacing: -1.6px;
+            margin-bottom: 21px;
+        }
+
+        .hero h1 span {
+            color: #9a7646;
+        }
+
+        .hero-description {
+            color: #65736a;
+            font-size: 15px;
+            max-width: 510px;
+            margin-bottom: 25px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 27px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 18px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--dark-green);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--green);
+            border-color: #d6ded5;
+        }
+
+        .btn-secondary:hover {
+            background: var(--sage);
+        }
+
+        .hero-points {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            color: #596a5e;
+            font-size: 11px;
+        }
+
+        .hero-points span::before {
+            content: "✓";
+            color: #4c8157;
+            font-weight: bold;
+            margin-right: 6px;
+        }
+
+        .hero-visual {
+            position: relative;
+        }
+
+        .hero-image {
+            display: block;
+            width: 100%;
+            height: 370px;
+            object-fit: cover;
+            border-radius: 17px;
+            box-shadow: 0 17px 40px rgba(36, 75, 58, 0.12);
+        }
+
+        .image-note {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 13px 15px;
+        }
+
+        .image-note-icon {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background: var(--sage);
+            color: var(--green);
+            border-radius: 50%;
+            font-size: 22px;
+        }
+
+        .image-note strong {
+            display: block;
+            color: var(--green);
+            font-size: 12px;
+        }
+
+        .image-note small {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        /* PROJECT STATISTICS */
+        .stats {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            overflow: hidden;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 23px 15px;
+        }
+
+        .stat + .stat {
+            border-left: 1px solid var(--border);
+        }
+
+        .stat strong {
+            display: block;
+            color: var(--green);
+            font-size: 24px;
+            margin-bottom: 3px;
+        }
+
+        .stat span {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* SECTION STYLES */
+        .section {
+            padding: 66px 0;
+        }
+
+        .section-white {
+            background: white;
+        }
+
+        .section-heading {
+            max-width: 690px;
+            text-align: center;
+            margin: 0 auto 34px;
+        }
+
+        .section-label {
+            color: #658267;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1.6px;
+            margin-bottom: 8px;
+        }
+
+        .section-heading h2 {
+            color: var(--dark-green);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(27px, 3vw, 36px);
+            line-height: 1.25;
+            margin-bottom: 10px;
+        }
+
+        .section-heading p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* PREDICTION FORM */
+        .predict-card {
+            max-width: 1000px;
+            margin: auto;
+            padding: 29px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            box-shadow: 0 10px 35px rgba(36, 75, 58, 0.045);
+        }
+
+        .form-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 18px;
+            margin-bottom: 23px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-heading h3 {
+            color: var(--green);
+            font-size: 19px;
+        }
+
+        .form-heading p {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .form-badge {
+            background: var(--sage);
+            color: var(--green);
+            padding: 7px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 19px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field label {
+            color: #46564b;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 11px;
+            border: 1px solid #dce3da;
+            border-radius: 7px;
+            background: white;
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: #729077;
+            box-shadow: 0 0 0 3px rgba(83, 122, 88, 0.1);
+        }
+
+        .form-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .form-note {
+            color: var(--muted);
+            font-size: 10px;
+            max-width: 620px;
+        }
+
+        .submit-btn {
+            border: none;
+            white-space: nowrap;
+        }
+
+        /* PROJECT CARDS */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .feature-card {
+            padding: 23px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(36, 75, 58, 0.08);
+        }
+
+        .feature-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            background: var(--sage);
+            color: var(--green);
+            border-radius: 10px;
+            font-size: 21px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            color: var(--green);
+            font-size: 15px;
+            margin-bottom: 7px;
+        }
+
+        .feature-card p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 13px;
+        }
+
+        .feature-link {
+            color: #527957;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* WORKFLOW */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .step-card {
+            padding: 23px;
+            border-left: 3px solid #9bb39a;
+            background: #f8f9f5;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .step-number {
+            color: #648267;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .step-card h3 {
+            color: var(--green);
+            font-size: 15px;
+            margin-bottom: 7px;
+        }
+
+        .step-card p {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--dark-green);
+            color: white;
+            padding: 29px 0;
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-brand {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        .footer-note {
+            color: #c4d0c6;
+            max-width: 590px;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 11px;
+            color: #e0e8e0;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1050px) {
+            .nav-inner {
+                flex-wrap: wrap;
+                padding: 13px 0;
+            }
+
+            .nav-links {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .hero-grid {
+                gap: 28px;
+            }
+        }
+
+        @media (max-width: 780px) {
+            .hero {
+                padding: 43px 0;
+            }
+
+            .hero-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-image {
+                height: 310px;
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .nav-links {
+                gap: 2px;
+            }
+
+            .nav-links a {
+                padding: 8px;
+                font-size: 11px;
+            }
+
+            .hero h1 {
+                font-size: 39px;
+            }
+
+            .hero-image {
+                height: 250px;
+            }
+
+            .form-grid,
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .predict-card {
+                padding: 18px;
+            }
+
+            .form-heading,
+            .form-footer {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .submit-btn {
+                width: 100%;
+            }
+
+            .section {
+                padding: 45px 0;
+            }
+
+            .stat {
+                padding: 17px 7px;
+            }
+
+            .stat strong {
+                font-size: 19px;
+            }
+
+            .stat span {
+                font-size: 10px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
+<header class="navbar">
+    <div class="container nav-inner">
 
-    <nav class="navbar">
+        <a href="{{ url_for('home') }}" class="brand">
+            <div class="brand-icon" aria-hidden="true">⌂</div>
+            <div>
+                <div class="brand-name">MeraGhar<span>.</span></div>
+                <div class="brand-tagline">Find your home value</div>
+            </div>
+        </a>
 
-        <div class="logo">
-            <span class="logo-icon">⌂</span>
-            <span>Mera<span class="logo-highlight">Ghar</span></span>
-        </div>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('dataset_explorer') }}">Dataset</a>
+            <a href="{{ url_for('preprocessing') }}">Preprocessing</a>
+            <a href="{{ url_for('visualization') }}">Visualizations</a>
+            <a href="{{ url_for('algorithms') }}">Models</a>
+            <a href="{{ url_for('about') }}">About</a>
+            <a href="#predict" class="nav-cta">Estimate Price →</a>
+        </nav>
 
-        <div class="nav-text">
-            Smart Indian Property Estimator
-        </div>
+    </div>
+</header>
 
-    </nav>
-
+<main>
 
     <!-- HERO SECTION -->
-
     <section class="hero">
+        <div class="container hero-grid">
 
-        <div class="hero-content">
+            <div>
+                <div class="eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    A DATA-DRIVEN HOME VALUE TOOL
+                </div>
 
-            <div class="badge">
-                🇮🇳 Made for Indian Properties
+                <h1>
+                    Find the real value of your
+                    <span>dream home.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Explore estimated house prices across Indian cities using
+                    property details and machine learning. MeraGhar brings
+                    property data and smart predictions together in one place.
+                </p>
+
+                <div class="hero-buttons">
+                    <a href="#predict" class="btn btn-primary">
+                        Estimate House Price →
+                    </a>
+
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                        Explore Dashboard
+                    </a>
+                </div>
+
+                <div class="hero-points">
+                    <span>Multiple Indian cities</span>
+                    <span>Machine learning model</span>
+                    <span>Property-based estimate</span>
+                </div>
             </div>
 
-            <h1>
-                Know the value of<br>
-                <span>your dream home.</span>
-            </h1>
+            <div class="hero-visual">
+                <img
+                    class="hero-image"
+                    src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1100&q=85"
+                    alt="Modern house surrounded by a garden"
+                >
 
-            <p>
-                Get an estimated property price using area,
-                bedrooms, city and property features.
-            </p>
+                <div class="image-note">
+                    <div class="image-note-icon">⌂</div>
+                    <div>
+                        <strong>A home of your own</strong>
+                        <small>Understand property value with data</small>
+                    </div>
+                </div>
+            </div>
 
         </div>
-
-        <div class="hero-house">
-            <div class="house-symbol">⌂</div>
-        </div>
-
     </section>
 
+    <!-- PROJECT STATISTICS -->
+    <section class="container">
+        <div class="stats">
 
-    <!-- PREDICTOR -->
-
-    <section class="predictor-section">
-
-        <div class="section-heading">
-
-            <p class="small-heading">PROPERTY DETAILS</p>
-
-            <h2>
-                Tell us about your property
-            </h2>
-
-            <p>
-                Enter a few details and MeraGhar will estimate its value.
-            </p>
-
-        </div>
-
-
-        <form action="/predict" method="POST" class="property-form">
-
-
-            <!-- CITY -->
-
-            <div class="form-group">
-
-                <label for="city">
-                    <span>🏙️</span>
-                    City
-                </label>
-
-                <select name="city" id="city" required>
-
-                    <option value="">Select your city</option>
-
-                    <option value="Pune">Pune</option>
-
-                    <option value="Mumbai">Mumbai</option>
-
-                    <option value="Bangalore">Bangalore</option>
-
-                    <option value="Hyderabad">Hyderabad</option>
-
-                    <option value="Noida">Noida</option>
-
-                    <option value="Ghaziabad">Ghaziabad</option>
-
-                </select>
-
+            <div class="stat">
+                <strong>5 Cities</strong>
+                <span>Represented in the project dataset</span>
             </div>
 
+            <div class="stat">
+                <strong>12 Features</strong>
+                <span>Property attributes used by the model</span>
+            </div>
 
-            <!-- AREA -->
+            <div class="stat">
+                <strong>5 Algorithms</strong>
+                <span>Compared during model training</span>
+            </div>
 
-            <div class="form-group">
+        </div>
+    </section>
 
-                <label for="area">
-                    <span>📐</span>
-                    Area
-                </label>
+    <!-- PREDICTION FORM -->
+    <section class="section section-white" id="predict">
+        <div class="container">
 
-                <div class="input-with-unit">
+            <div class="section-heading">
+                <div class="section-label">PRICE ESTIMATOR</div>
+                <h2>Tell us about the property</h2>
+                <p>
+                    Enter the details below. The trained machine learning model
+                    will use these features to estimate the house price.
+                </p>
+            </div>
 
-                    <input
-                        type="number"
-                        name="area"
-                        id="area"
-                        placeholder="e.g. 1200"
-                        min="300"
-                        required
-                    >
+            <div class="predict-card">
 
-                    <span>sq.ft.</span>
+                <div class="form-heading">
+                    <div>
+                        <h3>Property details</h3>
+                        <p>Fill in the available information about the house.</p>
+                    </div>
 
+                    <div class="form-badge">12 property features</div>
+                </div>
+
+                <form action="{{ url_for('predict') }}" method="POST">
+
+                    <div class="form-grid">
+
+                        <div class="field">
+                            <label for="city">City *</label>
+                            <select id="city" name="city" required>
+                                <option value="">Select city</option>
+                                {% for city in cities %}
+                                <option value="{{ city }}">{{ city }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="locality">Locality *</label>
+                            <select id="locality" name="locality" required>
+                                <option value="">Select locality</option>
+                                {% for locality in localities %}
+                                <option value="{{ locality }}">{{ locality }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="bedrooms">Bedrooms *</label>
+                            <input type="number" id="bedrooms" name="bedrooms"
+                                   min="1" max="10" step="1"
+                                   placeholder="e.g. 3" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="bathrooms">Bathrooms *</label>
+                            <input type="number" id="bathrooms" name="bathrooms"
+                                   min="1" max="10" step="1"
+                                   placeholder="e.g. 2" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="sqft_living">Living area (sq. ft.) *</label>
+                            <input type="number" id="sqft_living" name="sqft_living"
+                                   min="100" max="20000" step="1"
+                                   placeholder="e.g. 1500" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="floors">Number of floors *</label>
+                            <select id="floors" name="floors" required>
+                                <option value="">Select floors</option>
+                                {% for value in options.get('floors', [1, 2, 3, 4]) %}
+                                <option value="{{ value }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="year_built">Year built *</label>
+                            <input type="number" id="year_built" name="year_built"
+                                   min="1900" max="2026" step="1"
+                                   placeholder="e.g. 2018" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="parking">Parking spaces *</label>
+                            <select id="parking" name="parking" required>
+                                <option value="">Select parking</option>
+                                {% for value in options.get('parking', [0, 1, 2, 3]) %}
+                                <option value="{{ value }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="facing">House facing *</label>
+                            <select id="facing" name="facing" required>
+                                <option value="">Select direction</option>
+                                {% for value in options.get('facing', ['North', 'South', 'East', 'West']) %}
+                                <option value="{{ value }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="lift">Lift available *</label>
+                            <select id="lift" name="lift" required>
+                                <option value="">Select option</option>
+                                {% for value in options.get('lift', ['Yes', 'No']) %}
+                                <option value="{{ value }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="furnishing">Furnishing status *</label>
+                            <select id="furnishing" name="furnishing" required>
+                                <option value="">Select furnishing</option>
+                                {% for value in options.get('furnishing', ['Unfurnished', 'Semi-Furnished', 'Furnished']) %}
+                                <option value="{{ value }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="garden">Garden available *</label>
+                            <select id="garden" name="garden" required>
+                                <option value="">Select option</option>
+                                {% for value in options.get('garden', ['Yes', 'No']) %}
+                                <option value="{{ value }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="form-footer">
+                        <p class="form-note">
+                            This estimate is based on the supplied dataset and
+                            trained model. It is for educational use and should
+                            not be treated as a verified market valuation.
+                        </p>
+
+                        <button type="submit" class="btn btn-primary submit-btn">
+                            Calculate Estimated Price →
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- PROJECT PAGES -->
+    <section class="section">
+        <div class="container">
+
+            <div class="section-heading">
+                <div class="section-label">EXPLORE MERAGHAR</div>
+                <h2>Explore the complete project</h2>
+                <p>
+                    Discover the dataset, preprocessing, visualizations
+                    and machine learning models behind the predictions.
+                </p>
+            </div>
+
+            <div class="features-grid">
+
+                <a href="{{ url_for('dashboard') }}" class="feature-card">
+                    <div class="feature-icon">▦</div>
+                    <h3>Dashboard</h3>
+                    <p>View property statistics, city summaries and model results.</p>
+                    <span class="feature-link">Open dashboard →</span>
+                </a>
+
+                <a href="{{ url_for('dataset_explorer') }}" class="feature-card">
+                    <div class="feature-icon">▤</div>
+                    <h3>Dataset</h3>
+                    <p>Explore the house-price data and property features.</p>
+                    <span class="feature-link">Explore dataset →</span>
+                </a>
+
+                <a href="{{ url_for('preprocessing') }}" class="feature-card">
+                    <div class="feature-icon">⚙</div>
+                    <h3>Preprocessing</h3>
+                    <p>Review data types, missing values and data-quality checks.</p>
+                    <span class="feature-link">View preprocessing →</span>
+                </a>
+
+                <a href="{{ url_for('visualization') }}" class="feature-card">
+                    <div class="feature-icon">▥</div>
+                    <h3>Visualizations</h3>
+                    <p>Understand price patterns through charts and comparisons.</p>
+                    <span class="feature-link">View charts →</span>
+                </a>
+
+                <a href="{{ url_for('algorithms') }}" class="feature-card">
+                    <div class="feature-icon">⌘</div>
+                    <h3>Models</h3>
+                    <p>Compare machine learning algorithms and their metrics.</p>
+                    <span class="feature-link">Compare models →</span>
+                </a>
+
+                <a href="{{ url_for('about') }}" class="feature-card">
+                    <div class="feature-icon">ⓘ</div>
+                    <h3>About</h3>
+                    <p>Learn about the objective, workflow and technologies used.</p>
+                    <span class="feature-link">About the project →</span>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- WORKFLOW -->
+    <section class="section section-white">
+        <div class="container">
+
+            <div class="section-heading">
+                <div class="section-label">HOW IT WORKS</div>
+                <h2>From property details to price estimate</h2>
+                <p>A simple overview of the MeraGhar machine learning workflow.</p>
+            </div>
+
+            <div class="steps-grid">
+
+                <div class="step-card">
+                    <div class="step-number">STEP 01</div>
+                    <h3>Enter property details</h3>
+                    <p>Provide the city, locality, area, rooms and other features.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">STEP 02</div>
+                    <h3>Process the information</h3>
+                    <p>The saved preprocessing pipeline prepares features for the model.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">STEP 03</div>
+                    <h3>Get an estimate</h3>
+                    <p>The trained model uses the submitted details to estimate a price.</p>
                 </div>
 
             </div>
-
-
-            <!-- BEDROOMS -->
-
-            <div class="form-group">
-
-                <label for="bedrooms">
-                    <span>🛏️</span>
-                    Bedrooms
-                </label>
-
-                <select name="bedrooms" id="bedrooms" required>
-
-                    <option value="">Select bedrooms</option>
-
-                    <option value="1">1 Bedroom</option>
-
-                    <option value="2">2 Bedrooms</option>
-
-                    <option value="3">3 Bedrooms</option>
-
-                    <option value="4">4 Bedrooms</option>
-
-                </select>
-
-            </div>
-
-
-            <!-- PARKING -->
-
-            <div class="form-group">
-
-                <label for="parking">
-                    <span>🚗</span>
-                    Car Parking
-                </label>
-
-                <select name="parking" id="parking" required>
-
-                    <option value="">Select option</option>
-
-                    <option value="1">Yes</option>
-
-                    <option value="0">No</option>
-
-                </select>
-
-            </div>
-
-
-            <!-- POOL -->
-
-            <div class="form-group">
-
-                <label for="pool">
-                    <span>🏊</span>
-                    Swimming Pool
-                </label>
-
-                <select name="pool" id="pool" required>
-
-                    <option value="">Select option</option>
-
-                    <option value="1">Yes</option>
-
-                    <option value="0">No</option>
-
-                </select>
-
-            </div>
-
-
-            <!-- RESALE -->
-
-            <div class="form-group">
-
-                <label for="resale">
-                    <span>🔄</span>
-                    Resale Property
-                </label>
-
-                <select name="resale" id="resale" required>
-
-                    <option value="">Select option</option>
-
-                    <option value="0">No — New Property</option>
-
-                    <option value="1">Yes — Resale</option>
-
-                </select>
-
-            </div>
-
-
-            <!-- BUTTON -->
-
-            <button type="submit" class="predict-button">
-
-                <span>Estimate Property Value</span>
-
-                <span class="arrow">→</span>
-
-            </button>
-
-        </form>
-
+        </div>
     </section>
 
+</main>
 
-    <!-- HOW IT WORKS -->
+<footer>
+    <div class="container footer-inner">
 
-    <section class="how-section">
-
-        <div class="section-heading">
-
-            <p class="small-heading">HOW IT WORKS</p>
-
-            <h2>Simple. Quick. MeraGhar.</h2>
-
+        <div>
+            <div class="footer-brand">MeraGhar.</div>
+            <p class="footer-note">
+                A college machine-learning project for exploring house-price estimation.
+                Predictions depend on the supplied dataset and should not be used as
+                verified real-estate valuations.
+            </p>
         </div>
 
-
-        <div class="steps">
-
-            <div class="step">
-
-                <div class="step-number">01</div>
-
-                <h3>Enter Details</h3>
-
-                <p>
-                    Tell us about the area, bedrooms,
-                    city and property features.
-                </p>
-
-            </div>
-
-
-            <div class="step">
-
-                <div class="step-number">02</div>
-
-                <h3>Our Model Calculates</h3>
-
-                <p>
-                    Our machine learning model analyzes
-                    your property details.
-                </p>
-
-            </div>
-
-
-            <div class="step">
-
-                <div class="step-number">03</div>
-
-                <h3>Get Your Estimate</h3>
-
-                <p>
-                    Receive an estimated property value
-                    instantly.
-                </p>
-
-            </div>
-
+        <div class="footer-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('dataset_explorer') }}">Dataset</a>
+            <a href="{{ url_for('about') }}">About</a>
         </div>
 
-    </section>
-
-
-    <!-- FOOTER -->
-
-    <footer>
-
-        <div class="footer-logo">
-            Mera<span>Ghar</span>
-        </div>
-
-        <p>
-            Smart Indian Property Price Predictor
-        </p>
-
-        <p class="copyright">
-            © 2026 MeraGhar. Built for educational purposes.
-        </p>
-
-    </footer>
-
+    </div>
+</footer>
 
 </body>
-
 </html>

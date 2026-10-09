@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization | MeraGhar</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { box-sizing:border-box; }
+        body { margin:0; background:#f5f6f2; color:#29372e; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+        .layout { display:grid; grid-template-columns:225px minmax(0,1fr); min-height:100vh; }
+        aside { background:#203d31; padding:25px 17px; color:white; }
+        .brand { display:flex; align-items:center; gap:10px; margin:0 8px 34px; color:white; text-decoration:none; font-size:23px; font-weight:750; letter-spacing:-.7px; }
+        .house { width:36px; height:36px; display:grid; place-items:center; background:#e8eee5; color:#245b43; border-radius:7px; font-size:23px; }
+        .nav-label { margin:23px 10px 10px; color:#b7c8bc; font-size:10px; letter-spacing:1.4px; text-transform:uppercase; }
+        .nav-link { display:block; padding:11px 12px; margin:4px 0; border-radius:6px; color:#e0e9e2; font-size:13px; text-decoration:none; }
+        .nav-link:hover,.active { background:#365b48; }
+        main { min-width:0; padding:30px clamp(16px,3vw,38px); }
+        .topline { padding-bottom:20px; border-bottom:1px solid #e1e5de; }
+        h1 { margin:0; font-size:30px; letter-spacing:-.8px; }
+        h2 { margin:0 0 7px; font-size:16px; }
+        .muted { color:#788078; font-size:13px; line-height:1.7; }
+        .intro { max-width:850px; margin:17px 0 24px; }
+        .summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; margin-bottom:22px; }
+        .summary-card { padding:17px; background:white; border:1px solid #e2e6df; border-radius:8px; }
+        .summary-card span { color:#788078; font-size:12px; }
+        .summary-card strong { display:block; margin-top:8px; color:#245b43; font-size:24px; }
+        .charts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+        .chart-card { min-width:0; padding:19px; background:white; border:1px solid #e2e6df; border-radius:9px; }
+        .chart-card p { min-height:34px; margin:0 0 14px; color:#788078; font-size:12px; line-height:1.6; }
+        .chart-wrap { position:relative; height:275px; }
+        .wide { grid-column:1/-1; }
+        .notice { margin-top:20px; padding:15px 17px; border-left:3px solid #ba8b50; background:#fbf5e9; color:#736044; font-size:12px; line-height:1.8; }
+        footer { margin-top:25px; padding-top:17px; border-top:1px solid #e1e5de; color:#858d84; font-size:11px; line-height:1.7; }
+        @media(max-width:900px) { .charts { grid-template-columns:1fr; } .wide { grid-column:auto; } }
+        @media(max-width:650px) { .layout { grid-template-columns:1fr; } aside { padding:15px; } .brand { margin:0 8px 15px; } .nav-link { display:inline-block; margin:3px; } main { padding:22px 13px; } .summary { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside>
+        <a class="brand" href="/">
+            <span class="house">⌂</span>
+            <span>MeraGhar<span style="color:#d5a66d">.</span></span>
+        </a>
+        <div class="nav-label">Workspace</div>
+        <a class="nav-link" href="/dashboard">▦ &nbsp; Dashboard</a>
+        <a class="nav-link" href="/dataset">▤ &nbsp; Dataset Explorer</a>
+        <a class="nav-link" href="/preprocessing">⚒ &nbsp; Data Preprocessing</a>
+        <a class="nav-link active" href="/visualization">▥ &nbsp; Data Visualization</a>
+        <a class="nav-link" href="/algorithms">◫ &nbsp; Model Comparison</a>
+        <div class="nav-label">Property tools</div>
+        <a class="nav-link" href="/">⌂ &nbsp; Price Estimator</a>
+        <a class="nav-link" href="/about">ⓘ &nbsp; About Project</a>
+    </aside>
+
+    <main>
+        <header class="topline">
+            <h1>Data Visualization</h1>
+            <p class="muted">
+                Explore how location, size, bedrooms and property characteristics
+                relate to house prices in the supplied dataset.
+            </p>
+        </header>
+
+        <p class="muted intro">
+            Each chart is calculated from the current dataset. Use these views
+            to identify patterns and compare groups; an observed relationship
+            does not necessarily mean one feature causes a price change.
+        </p>
+
+        <section class="summary">
+            <div class="summary-card">
+                <span>Records visualized</span>
+                <strong>{{ "{:,}".format(total_rows) }}</strong>
+            </div>
+            <div class="summary-card">
+                <span>Cities compared</span>
+                <strong>{{ city_labels|length }}</strong>
+            </div>
+            <div class="summary-card">
+                <span>Visualizations</span>
+                <strong>6</strong>
+            </div>
+        </section>
+
+        <section class="charts">
+            <article class="chart-card">
+                <h2>1. Average house price by city</h2>
+                <p>Compare mean property prices across the cities in the dataset.</p>
+                <div class="chart-wrap"><canvas id="cityChart"></canvas></div>
+            </article>
+
+            <article class="chart-card">
+                <h2>2. Living area vs house price</h2>
+                <p>Each dot represents one property. Look for a relationship between area and price.</p>
+                <div class="chart-wrap"><canvas id="areaChart"></canvas></div>
+            </article>
+
+            <article class="chart-card">
+                <h2>3. Average price by bedrooms</h2>
+                <p>Compare average property prices by the number of bedrooms.</p>
+                <div class="chart-wrap"><canvas id="bedroomChart"></canvas></div>
+            </article>
+
+            <article class="chart-card">
+                <h2>4. House price distribution</h2>
+                <p>See how many dataset records fall within each price range.</p>
+                <div class="chart-wrap"><canvas id="distributionChart"></canvas></div>
+            </article>
+
+            <article class="chart-card">
+                <h2>5. Average price by furnishing</h2>
+                <p>Compare furnished, semi-furnished and unfurnished properties.</p>
+                <div class="chart-wrap"><canvas id="furnishingChart"></canvas></div>
+            </article>
+
+            <article class="chart-card">
+                <h2>6. Property age vs average price</h2>
+                <p>Compare average prices for newer and older properties.</p>
+                <div class="chart-wrap"><canvas id="ageChart"></canvas></div>
+            </article>
+        </section>
+
+        <div class="notice">
+            <strong>How to interpret these graphs:</strong>
+            The values describe the supplied dataset only. If its records are
+            synthetic, these visualizations demonstrate data-analysis methods
+            and should not be presented as verified Indian real-estate market
+            statistics.
+        </div>
+
+        <footer>
+            MeraGhar · Data Visualization · Prices are shown in Indian rupees (INR).
+        </footer>
+    </main>
+</div>
+
+<script>
+    const cityLabels = {{ city_labels | tojson }};
+    const cityMeans = {{ city_means | tojson }};
+    const bedroomLabels = {{ bedroom_labels | tojson }};
+    const bedroomMeans = {{ bedroom_means | tojson }};
+    const distributionLabels = {{ distribution_labels | tojson }};
+    const distributionCounts = {{ distribution_counts | tojson }};
+    const furnishingLabels = {{ furnishing_labels | tojson }};
+    const furnishingMeans = {{ furnishing_means | tojson }};
+    const areaLabels = {{ area_labels | tojson }};
+    const areaMeans = {{ area_means | tojson }};
+    const ageLabels = {{ age_labels | tojson }};
+    const ageMeans = {{ age_means | tojson }};
+
+    const formatINR = value => "₹" + Number(value).toLocaleString("en-IN", {
+        maximumFractionDigits: 0
+    });
+
+    Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+    Chart.defaults.color = "#707970";
+
+    function makeBarChart(id, labels, values, label, color, money = true) {
+        new Chart(document.getElementById(id), {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: values,
+                    backgroundColor: color,
+                    borderRadius: 4,
+                    maxBarThickness: 55
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: context => money
+                                ? formatINR(context.raw)
+                                : Number(context.raw).toLocaleString("en-IN")
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => money
+                                ? "₹" + (Number(value) / 100000).toFixed(0) + "L"
+                                : value
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    makeBarChart("cityChart", cityLabels, cityMeans, "Average price", "#47785a");
+    makeBarChart("bedroomChart", bedroomLabels, bedroomMeans, "Average price", "#bd9158");
+    makeBarChart("furnishingChart", furnishingLabels, furnishingMeans, "Average price", "#47785a");
+    makeBarChart("areaChart", areaLabels, areaMeans, "Average price", "#bd9158");
+    makeBarChart("ageChart", ageLabels, ageMeans, "Average price", "#47785a");
+
+    new Chart(document.getElementById("distributionChart"), {
+        type: "bar",
+        data: {
+            labels: distributionLabels,
+            datasets: [{
+                label: "Number of properties",
+                data: distributionCounts,
+                backgroundColor: "#7897a0",
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: context => `${context.raw} properties`
+                    }
+                }
+            },
+            scales: {
+                x: { title: { display: true, text: "Price range" }, grid: { display: false } },
+                y: { beginAtZero: true, title: { display: true, text: "Properties" }, ticks: { precision: 0 } }
+            }
+        }
+    });
+</script>
+</body>
+</html>

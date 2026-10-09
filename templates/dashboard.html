@@ -1,0 +1,649 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | MeraGhar</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --green: #204333;
+            --green-light: #365e49;
+            --sage: #e8f0e7;
+            --gold: #c19a63;
+            --bg: #f2f4f1;
+            --text: #293a30;
+            --muted: #7b847d;
+            --border: #e0e5de;
+            --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        a { text-decoration: none; }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 240px minmax(0, 1fr);
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            background: var(--green);
+            color: white;
+            padding: 26px 15px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 10px;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 39px;
+            height: 39px;
+            background: #e9efe6;
+            color: var(--green);
+            border-radius: 9px;
+            font-size: 25px;
+            flex-shrink: 0;
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: 750;
+            letter-spacing: -0.8px;
+        }
+
+        .brand-name span { color: #d4ad75; }
+
+        .brand-subtitle {
+            font-size: 10px;
+            color: #bdcec2;
+            margin-top: 1px;
+        }
+
+        .nav-label {
+            margin: 22px 10px 9px;
+            color: #b7c9bc;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            min-height: 44px;
+            margin: 3px 0;
+            padding: 11px 12px;
+            border-radius: 7px;
+            color: #e1eae3;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .nav-icon {
+            width: 19px;
+            text-align: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--green-light);
+            color: white;
+        }
+
+        .nav-link.active {
+            box-shadow: inset 3px 0 #8eb69a;
+            font-weight: 650;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding: 18px 10px 0;
+            border-top: 1px solid rgba(255,255,255,.13);
+            color: #c2d0c6;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #9dcba4;
+            margin-right: 6px;
+        }
+
+        /* MAIN CONTENT */
+        main {
+            min-width: 0;
+            padding: 30px clamp(18px, 3vw, 42px);
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding-bottom: 22px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 29px;
+            letter-spacing: -1px;
+            color: #2d3d32;
+        }
+
+        .breadcrumb {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .top-badge {
+            background: var(--sage);
+            color: #356547;
+            border-radius: 5px;
+            padding: 8px 11px;
+            font-size: 11px;
+            font-weight: 650;
+            white-space: nowrap;
+        }
+
+        .intro {
+            margin: 22px 0;
+            color: #737d74;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* SUMMARY CARDS */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 21px;
+            min-width: 0;
+            box-shadow: 0 2px 5px rgba(31, 59, 42, .015);
+        }
+
+        .card-label {
+            color: #7a827b;
+            font-size: 12px;
+        }
+
+        .card strong {
+            display: block;
+            margin-top: 17px;
+            color: #315b43;
+            font-size: clamp(20px, 2vw, 28px);
+            letter-spacing: -.7px;
+            overflow-wrap: anywhere;
+        }
+
+        .card small {
+            display: block;
+            margin-top: 8px;
+            color: #899188;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .section-heading {
+            margin: 32px 0 15px;
+            font-size: 18px;
+            letter-spacing: -.3px;
+        }
+
+        /* CHARTS */
+        .charts {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .panel {
+            min-width: 0;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(31, 59, 42, .015);
+        }
+
+        .panel h3 {
+            margin: 0 0 7px;
+            font-size: 15px;
+            font-weight: 650;
+        }
+
+        .panel p {
+            margin: 0 0 17px;
+            color: #818980;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 270px;
+            width: 100%;
+        }
+
+        /* MODEL TABLE */
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        th, td {
+            padding: 13px 11px;
+            text-align: left;
+            border-bottom: 1px solid #edf0eb;
+        }
+
+        th {
+            background: #f7f8f5;
+            color: #6c776d;
+            font-weight: 650;
+        }
+
+        tbody tr:hover { background: #fafbf8; }
+
+        .tag {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 4px 7px;
+            border-radius: 4px;
+            background: #e7f2e8;
+            color: #2f7047;
+            font-size: 10px;
+            font-weight: 650;
+        }
+
+        .notice {
+            margin-top: 23px;
+            padding: 15px 17px;
+            border-left: 3px solid var(--gold);
+            background: #fbf5e9;
+            color: #776347;
+            font-size: 12px;
+            line-height: 1.7;
+            border-radius: 0 5px 5px 0;
+        }
+
+        footer {
+            margin-top: 27px;
+            padding-bottom: 10px;
+            color: #8a928a;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1150px) {
+            .layout { grid-template-columns: 215px minmax(0, 1fr); }
+            .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 800px) {
+            .layout { grid-template-columns: 1fr; }
+
+            .sidebar {
+                min-height: auto;
+                padding: 17px;
+            }
+
+            .brand { margin-bottom: 14px; }
+
+            .nav-label { margin-top: 13px; }
+
+            .nav-link {
+                display: inline-flex;
+                min-height: 38px;
+                margin: 2px;
+                padding: 9px 10px;
+            }
+
+            .sidebar-bottom { display: none; }
+
+            .charts { grid-template-columns: 1fr; }
+
+            main { padding: 23px 17px; }
+        }
+
+        @media (max-width: 480px) {
+            .cards { grid-template-columns: 1fr 1fr; gap: 9px; }
+            .card { padding: 14px; }
+            .card strong { font-size: 20px; }
+            .card-label { font-size: 11px; }
+            .topbar { align-items: flex-start; }
+            h1 { font-size: 24px; }
+            .top-badge { font-size: 10px; }
+            .panel { padding: 15px; }
+            .chart-wrap { height: 240px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="layout">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+
+        <a class="brand" href="{{ url_for('home') }}">
+            <span class="brand-icon">⌂</span>
+            <span>
+                <span class="brand-name">MeraGhar<span>.</span></span>
+                <span class="brand-subtitle" style="display:block">
+                    House Price Analytics
+                </span>
+            </span>
+        </a>
+
+        <div class="nav-label">Workspace</div>
+
+        <a class="nav-link active" href="{{ url_for('dashboard') }}">
+            <span class="nav-icon">▦</span> Dashboard
+        </a>
+
+        <a class="nav-link" href="{{ url_for('dataset_explorer') }}">
+            <span class="nav-icon">▤</span> Dataset Explorer
+        </a>
+
+        <a class="nav-link" href="{{ url_for('preprocessing') }}">
+            <span class="nav-icon">⚙</span> Data Preprocessing
+        </a>
+
+        <a class="nav-link" href="{{ url_for('visualization') }}">
+            <span class="nav-icon">▥</span> Data Visualization
+        </a>
+
+        <a class="nav-link" href="{{ url_for('algorithms') }}">
+            <span class="nav-icon">⌘</span> Model Comparison
+        </a>
+
+        <div class="nav-label">Property Tools</div>
+
+        <a class="nav-link" href="{{ url_for('home') }}#predict">
+            <span class="nav-icon">⌂</span> Price Estimator
+        </a>
+
+        <a class="nav-link" href="{{ url_for('about') }}">
+            <span class="nav-icon">ⓘ</span> About Project
+        </a>
+
+        <div class="sidebar-bottom">
+            <div><span class="status-dot"></span>Dataset connected</div>
+            <div>House price prediction</div>
+            <div>Academic ML project · INR</div>
+        </div>
+
+    </aside>
+
+    <!-- DASHBOARD CONTENT -->
+    <main>
+
+        <header class="topbar">
+            <div>
+                <h1>Project dashboard</h1>
+                <span class="breadcrumb">MeraGhar / Overview</span>
+            </div>
+            <span class="top-badge">Machine Learning</span>
+        </header>
+
+        <p class="intro">
+            An overview of the property dataset, its price distribution and
+            the algorithms evaluated for the house-price estimation project.
+        </p>
+
+        <!-- STATISTICS -->
+        <section class="cards">
+
+            <div class="card">
+                <span class="card-label">Property records</span>
+                <strong>{{ "{:,}".format(stats.total_properties) }}</strong>
+                <small>Rows in the supplied dataset</small>
+            </div>
+
+            <div class="card">
+                <span class="card-label">Average listed price</span>
+                <strong>₹{{ "{:,.0f}".format(stats.average_price) }}</strong>
+                <small>Mean of dataset prices</small>
+            </div>
+
+            <div class="card">
+                <span class="card-label">Median listed price</span>
+                <strong>₹{{ "{:,.0f}".format(stats.median_price) }}</strong>
+                <small>Middle value of dataset prices</small>
+            </div>
+
+            <div class="card">
+                <span class="card-label">Cities represented</span>
+                <strong>{{ stats.cities }}</strong>
+                <small>Distinct city names in the dataset</small>
+            </div>
+
+        </section>
+
+        <!-- CHARTS -->
+        <h2 class="section-heading">Dataset insights</h2>
+
+        <section class="charts">
+
+            <div class="panel">
+                <h3>Records by city</h3>
+                <p>Number of properties represented for each city.</p>
+                <div class="chart-wrap">
+                    <canvas id="cityCountChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>Average price by city</h3>
+                <p>Average listed house price for each city in the dataset.</p>
+                <div class="chart-wrap">
+                    <canvas id="cityPriceChart"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- MODEL COMPARISON -->
+        <h2 class="section-heading">Model performance</h2>
+
+        <section class="panel">
+            <h3>Algorithm comparison</h3>
+            <p>
+                Performance metrics measured on the held-out test split
+                during model training.
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Algorithm</th>
+                            <th>R² score</th>
+                            <th>MAE (₹)</th>
+                            <th>RMSE (₹)</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for item in comparison %}
+                        <tr>
+                            <td>
+                                {{ item.algorithm }}
+                                {% if item.algorithm == stats.best_model %}
+                                    <span class="tag">Selected</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ "%.4f"|format(item.r2_score) }}</td>
+                            <td>{{ "{:,.0f}".format(item.mae) }}</td>
+                            <td>{{ "{:,.0f}".format(item.rmse) }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4">
+                                No model results found. Run train_model.py first.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="notice">
+            <strong>Data limitation:</strong>
+            These statistics describe the supplied dataset, not the entire
+            Indian property market. If the records are synthetic, the charts
+            and model scores are for project demonstration and should not be
+            interpreted as verified market evidence.
+        </div>
+
+        <footer>
+            MeraGhar · Academic machine-learning project · Prices shown in INR.
+            Model scores describe performance on the selected test split.
+        </footer>
+
+    </main>
+</div>
+
+<script>
+    const cityLabels =
+        {{ city_counts | map(attribute='city') | list | tojson }};
+
+    const cityCounts =
+        {{ city_counts | map(attribute='count') | list | tojson }};
+
+    const priceLabels =
+        {{ city_prices | map(attribute='city') | list | tojson }};
+
+    const cityPrices =
+        {{ city_prices | map(attribute='price') | list | tojson }};
+
+    Chart.defaults.font.family =
+        '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+
+    Chart.defaults.color = "#727c73";
+
+    new Chart(document.getElementById("cityCountChart"), {
+        type: "bar",
+        data: {
+            labels: cityLabels,
+            datasets: [{
+                label: "Property records",
+                data: cityCounts,
+                backgroundColor: "#4f8063",
+                borderRadius: 5,
+                maxBarThickness: 55
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    grid: { display: false }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 },
+                    grid: { color: "#e9ede7" }
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById("cityPriceChart"), {
+        type: "bar",
+        data: {
+            labels: priceLabels,
+            datasets: [{
+                label: "Average price",
+                data: cityPrices,
+                backgroundColor: "#c19a63",
+                borderRadius: 5,
+                maxBarThickness: 55
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return "₹" +
+                                Number(context.raw).toLocaleString("en-IN");
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: "#e9ede7" },
+                    ticks: {
+                        callback: function(value) {
+                            return "₹" +
+                                (Number(value) / 100000).toFixed(0) + "L";
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About the Project | MeraGhar</title>
+    <style>
+        * { box-sizing:border-box; }
+        body { margin:0; background:#f5f6f3; color:#29372e; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+        .layout { display:grid; grid-template-columns:225px minmax(0,1fr); min-height:100vh; }
+        aside { background:#203d31; padding:27px 18px; color:white; }
+        .brand { display:block; margin:0 8px 35px; font-size:25px; font-weight:750; color:white; text-decoration:none; letter-spacing:-1px; }
+        .nav-label { margin:24px 10px 10px; color:#b7c8bc; font-size:10px; letter-spacing:1.4px; text-transform:uppercase; }
+        .nav-link { display:block; padding:11px 12px; margin:4px 0; border-radius:6px; color:#e0e9e2; font-size:13px; text-decoration:none; }
+        .nav-link:hover,.active { background:#365b48; }
+        main { min-width:0; padding:30px clamp(16px,4vw,42px); }
+        .header { padding-bottom:22px; border-bottom:1px solid #e1e5de; }
+        h1 { margin:0; font-size:clamp(28px,4vw,36px); letter-spacing:-1px; }
+        h2 { margin:0 0 12px; font-size:19px; }
+        p { color:#707970; font-size:14px; line-height:1.8; }
+        .intro { max-width:800px; margin:25px 0; font-size:16px; }
+        .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+        .card { background:white; border:1px solid #e2e6df; border-radius:9px; padding:22px; min-width:0; }
+        .number { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; margin-bottom:14px; border-radius:6px; background:#e8f1e8; color:#245b43; font-weight:750; }
+        .wide { margin-top:16px; }
+        .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; }
+        .chip { padding:8px 10px; background:#f0f3ee; color:#49604f; border-radius:5px; font-size:12px; }
+        .warning { margin-top:20px; padding:18px; background:#fbf5e9; border-left:3px solid #ba8b50; border-radius:4px; }
+        .warning p { margin-bottom:0; color:#736044; }
+        .button { display:inline-block; margin-top:22px; padding:12px 17px; border-radius:6px; background:#245b43; color:white; text-decoration:none; font-size:14px; font-weight:650; }
+        footer { margin-top:30px; padding-top:20px; border-top:1px solid #e1e5de; color:#858d84; font-size:12px; }
+        @media(max-width:750px) { .layout { grid-template-columns:1fr; } aside { padding:15px; } .brand { margin:0 8px 15px; } .nav-link { display:inline-block; margin:3px; } main { padding:22px 14px; } .grid { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside>
+        <a class="brand" href="/">MeraGhar<span style="color:#d5a66d">.</span></a>
+        <div class="nav-label">Workspace</div>
+        <a class="nav-link" href="/dashboard">▦ &nbsp; Dashboard</a>
+        <a class="nav-link" href="/dataset">▤ &nbsp; Dataset Explorer</a>
+        <a class="nav-link" href="/algorithms">◫ &nbsp; Model Comparison</a>
+        <div class="nav-label">Property tools</div>
+        <a class="nav-link" href="/">⌂ &nbsp; Price Estimator</a>
+        <a class="nav-link active" href="/about">ⓘ &nbsp; About Project</a>
+    </aside>
+
+    <main>
+        <header class="header">
+            <h1>About MeraGhar</h1>
+            <p>A machine-learning project for exploring house-price estimation.</p>
+        </header>
+
+        <p class="intro">
+            MeraGhar is an academic web application that accepts property details
+            and estimates a price using a regression model trained on a supplied
+            dataset. It combines data preprocessing, model evaluation and a
+            simple web interface in one project.
+        </p>
+
+        <section class="grid">
+            <article class="card">
+                <span class="number">01</span>
+                <h2>Project objective</h2>
+                <p>
+                    Build an interactive tool that demonstrates how property
+                    attributes such as location, living area, bedrooms, age
+                    and amenities can be used as inputs for a price-prediction
+                    model.
+                </p>
+            </article>
+
+            <article class="card">
+                <span class="number">02</span>
+                <h2>Dataset</h2>
+                <p>
+                    The project CSV contains city, locality, bedrooms, bathrooms,
+                    living area, floors, construction year, parking, facing,
+                    lift, furnishing, garden and price.
+                </p>
+                <p>
+                    The training script checks required columns, converts
+                    numeric fields, removes rows with unusable target prices,
+                    and handles missing feature values through preprocessing.
+                </p>
+            </article>
+
+            <article class="card">
+                <span class="number">03</span>
+                <h2>Machine-learning workflow</h2>
+                <p>
+                    The dataset is split into training and testing portions.
+                    Numeric fields are imputed and scaled, while categorical
+                    fields are imputed and one-hot encoded.
+                </p>
+                <p>
+                    Multiple regression algorithms are trained and evaluated
+                    using R², Mean Absolute Error and Root Mean Squared Error.
+                </p>
+            </article>
+
+            <article class="card">
+                <span class="number">04</span>
+                <h2>Technology stack</h2>
+                <p>The main technologies used in this implementation are:</p>
+                <div class="chips">
+                    <span class="chip">Python</span>
+                    <span class="chip">Flask</span>
+                    <span class="chip">Pandas</span>
+                    <span class="chip">Scikit-learn</span>
+                    <span class="chip">HTML</span>
+                    <span class="chip">CSS</span>
+                    <span class="chip">JavaScript</span>
+                    <span class="chip">Chart.js</span>
+                </div>
+            </article>
+        </section>
+
+        <section class="card wide">
+            <h2>Algorithms evaluated</h2>
+            <p>
+                The training script compares Linear Regression, Decision Tree,
+                Random Forest, Extra Trees and Gradient Boosting. The model
+                with the strongest test-set R² score is saved for prediction,
+                using MAE to break ties.
+            </p>
+            <p>
+                These evaluation results are specific to the supplied dataset
+                and test split; they do not guarantee performance on unseen
+                real-world properties.
+            </p>
+        </section>
+
+        <section class="warning">
+            <strong>Project limitation</strong>
+            <p>
+                Dataset authenticity matters. If the CSV contains synthetic
+                or generated records, the application demonstrates the
+                machine-learning workflow but cannot establish reliable
+                real-market property valuations. Real listing data and
+                independent validation would be required for that purpose.
+            </p>
+        </section>
+
+        <a class="button" href="/">Try the property estimator →</a>
+
+        <footer>
+            MeraGhar · Academic project · Property estimates are experimental
+            and should not be used as verified valuations.
+        </footer>
+    </main>
+</div>
+</body>
+</html>

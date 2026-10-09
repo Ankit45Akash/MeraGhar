@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataset Explorer | MeraGhar</title>
+    <style>
+        * { box-sizing:border-box; }
+        body { margin:0; background:#f5f6f3; color:#29372e; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+        .layout { display:grid; grid-template-columns:225px minmax(0,1fr); min-height:100vh; }
+        aside { background:#203d31; padding:27px 18px; color:white; }
+        .brand { display:block; margin:0 8px 35px; font-size:25px; font-weight:750; color:white; text-decoration:none; letter-spacing:-1px; }
+        .nav-label { margin:24px 10px 10px; color:#b7c8bc; font-size:10px; letter-spacing:1.4px; text-transform:uppercase; }
+        .nav-link { display:block; padding:11px 12px; margin:4px 0; border-radius:6px; color:#e0e9e2; font-size:13px; text-decoration:none; }
+        .nav-link:hover,.active { background:#365b48; }
+        main { min-width:0; padding:30px clamp(16px,4vw,42px); }
+        .topline { display:flex; justify-content:space-between; align-items:center; gap:15px; flex-wrap:wrap; padding-bottom:22px; border-bottom:1px solid #e1e5de; }
+        h1 { margin:0; font-size:29px; letter-spacing:-.8px; }
+        .muted { color:#788078; font-size:13px; line-height:1.7; }
+        .summary { display:flex; flex-wrap:wrap; gap:12px; margin:24px 0; }
+        .summary-card { padding:16px 20px; background:white; border:1px solid #e2e6df; border-radius:8px; min-width:150px; }
+        .summary-card span { display:block; color:#788078; font-size:12px; }
+        .summary-card strong { display:block; margin-top:7px; color:#245b43; font-size:24px; }
+        .panel { padding:20px; background:white; border:1px solid #e2e6df; border-radius:9px; }
+        .tools { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-bottom:18px; }
+        input { width:min(100%,350px); min-height:42px; padding:10px 12px; border:1px solid #d8ddd8; border-radius:6px; font:inherit; }
+        .table-wrap { overflow:auto; max-height:65vh; border:1px solid #e8ebe6; border-radius:6px; }
+        table { width:100%; border-collapse:collapse; white-space:nowrap; font-size:12px; }
+        th,td { padding:12px 13px; text-align:left; border-bottom:1px solid #edf0eb; }
+        th { position:sticky; top:0; background:#eef2ed; color:#4e5d51; z-index:1; }
+        tbody tr:nth-child(even) { background:#fafbf9; }
+        tbody tr:hover { background:#eef5ee; }
+        .count { color:#788078; font-size:12px; }
+        .notice { margin-top:18px; padding:14px 16px; border-left:3px solid #ba8b50; background:#fbf5e9; color:#736044; font-size:12px; line-height:1.7; }
+        @media(max-width:650px) { .layout { grid-template-columns:1fr; } aside { padding:15px; } .brand { margin:0 8px 15px; } .nav-link { display:inline-block; margin:3px; } main { padding:22px 12px; } .panel { padding:12px; } }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside>
+        <a class="brand" href="/">MeraGhar<span style="color:#d5a66d">.</span></a>
+        <div class="nav-label">Workspace</div>
+        <a class="nav-link" href="/dashboard">▦ &nbsp; Dashboard</a>
+        <a class="nav-link active" href="/dataset">▤ &nbsp; Dataset Explorer</a>
+        <a class="nav-link" href="/algorithms">◫ &nbsp; Model Comparison</a>
+        <div class="nav-label">Property tools</div>
+        <a class="nav-link" href="/">⌂ &nbsp; Price Estimator</a>
+        <a class="nav-link" href="/about">ⓘ &nbsp; About Project</a>
+    </aside>
+
+    <main>
+        <div class="topline">
+            <div>
+                <h1>Dataset explorer</h1>
+                <p class="muted">Inspect the records used to train the MeraGhar model.</p>
+            </div>
+            <span class="count">Showing up to 100 records</span>
+        </div>
+
+        <section class="summary">
+            <div class="summary-card">
+                <span>Total records</span>
+                <strong>{{ "{:,}".format(total_rows) }}</strong>
+            </div>
+            <div class="summary-card">
+                <span>Columns</span>
+                <strong>{{ columns|length }}</strong>
+            </div>
+            <div class="summary-card">
+                <span>Prediction target</span>
+                <strong style="font-size:19px">Price</strong>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="tools">
+                <div>
+                    <strong>Property records</strong>
+                    <p class="muted">Search visible rows by city, locality, or any displayed value.</p>
+                </div>
+                <input id="searchBox" type="search" placeholder="Search records..." aria-label="Search dataset">
+            </div>
+
+            <div class="table-wrap">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            {% for column in columns %}
+                            <th>{{ column.replace('_', ' ')|title }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            {% for column in columns %}
+                            <td>
+                                {% if column == 'price' %}
+                                    ₹{{ "{:,.0f}".format(row[column]|float) }}
+                                {% else %}
+                                    {{ row[column] }}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <p class="muted" id="visibleCount" aria-live="polite"></p>
+        </section>
+
+        <div class="notice">
+            <strong>Dataset note:</strong> The table displays at most the first
+            100 records for easier browsing. The model training script uses the
+            valid records from the dataset file. If your dataset is synthetic,
+            these records should be treated as demonstration data rather than
+            verified property listings.
+        </div>
+    </main>
+</div>
+
+<script>
+    const searchBox = document.getElementById("searchBox");
+    const tableRows = Array.from(document.querySelectorAll("#dataTable tbody tr"));
+    const visibleCount = document.getElementById("visibleCount");
+
+    function updateTable() {
+        const query = searchBox.value.toLowerCase().trim();
+        let visible = 0;
+
+        tableRows.forEach(row => {
+            const matches = row.textContent.toLowerCase().includes(query);
+            row.style.display = matches ? "" : "none";
+            if (matches) visible++;
+        });
+
+        visibleCount.textContent =
+            `Showing ${visible} of ${tableRows.length} displayed records.`;
+    }
+
+    searchBox.addEventListener("input", updateTable);
+    updateTable();
+</script>
+</body>
+</html>
